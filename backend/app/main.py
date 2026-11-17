@@ -70,14 +70,14 @@ async def analyze_image(file: Annotated[UploadFile, File(description="JPG, PNG, 
 
     try:
         detector = await run_in_threadpool(get_detector)
-        predictions = await run_in_threadpool(detector.predict, image)
+        prediction = await run_in_threadpool(detector.predict, image)
     except ModelUnavailableError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     return {
-        "status": "ok" if predictions else "no_sign_detected",
+        "status": "ok",
         "model": {"name": detector.name, "version": detector.version},
-        "predictions": predictions,
+        "prediction": prediction,
     }

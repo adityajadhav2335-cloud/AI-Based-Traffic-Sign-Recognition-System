@@ -10,6 +10,7 @@ class ModelUnavailableError(Exception):
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(BACKEND_ROOT / ".env")
 DEFAULT_MODEL_PATH = BACKEND_ROOT / "models" / "mobilenetv2_traffic_sign.keras"
+MODEL_UNAVAILABLE_MESSAGE = "AI recognition is not available yet. The trained model has not been integrated."
 
 
 def model_path() -> Path:
@@ -24,16 +25,7 @@ def model_ready() -> bool:
 
 
 def model_status() -> tuple[bool, str]:
-    weights = model_path()
-    if not weights.is_file():
-        return False, (
-            "No trained MobileNetV2 classifier is configured. Image validation and upload are ready, "
-            "but real sign recognition is unavailable until a dataset has been prepared and a model trained."
-        )
-    return False, (
-        "A model file was found, but the MobileNetV2 inference and class-map integration is not implemented yet. "
-        "No prediction will be returned."
-    )
+    return False, MODEL_UNAVAILABLE_MESSAGE
 
 
 def get_detector() -> None:

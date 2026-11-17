@@ -9,7 +9,7 @@ A college demonstration project for Indian traffic signs. The current applicatio
 - Frontend validation before upload; backend validates content type, image format, file size, and image dimensions.
 - `GET /api/health` reports API availability and whether a trained model is ready.
 - `POST /api/analyze` accepts an image and returns a clear `503` message when model weights or the future inference integration are unavailable.
-- The illustrative Stop example is separate from image upload and is labelled **DEMO OUTPUT — ILLUSTRATIVE EXAMPLE, NOT A REAL MODEL PREDICTION**. It has no confidence score.
+- The illustrative Stop example is a separate **Illustrative Example** section, distinct from both the upload preview and analysis result. It is labelled **DEMO OUTPUT — ILLUSTRATIVE EXAMPLE, NOT A REAL MODEL PREDICTION** and has no confidence score.
 - The hero image is stored locally, so the page does not depend on a remote stock-photo URL.
 
 ## Current limitations
@@ -55,7 +55,7 @@ Expected health response before model training:
 {
   "status": "ok",
   "model_ready": false,
-  "message": "No trained MobileNetV2 classifier is configured. Image validation and upload are ready, but real sign recognition is unavailable until a dataset has been prepared and a model trained."
+  "message": "AI recognition is not available yet. The trained model has not been integrated."
 }
 ```
 
@@ -64,7 +64,7 @@ Expected health response before model training:
 1. Start both services and open the Vite URL.
 2. Select a JPG, PNG, or WEBP image under 10 MB. The preview appears and the file is sent to FastAPI.
 3. With no trained model installed, the API returns `503`; the UI displays the backend's explanation. This is the expected honest result.
-4. Select **Show illustrative sample output** to display a fixed Stop-sign reference. It does not use the uploaded image or call the model.
+4. Select **Show Illustrative Example** to display a fixed Stop-sign reference in its own section. It does not use the uploaded image or call the model.
 5. To capture screenshots, take one of the main page after loading it, one of the selected-image preview, one of the `503` model-unavailable message, and one of the labelled illustrative output. Optionally capture `/api/health` or FastAPI `/docs` in a browser tab as an API screenshot.
 
 The illustrative Stop-sign meaning and driver action follow Rule 7 of India's Rules of the Road Regulations, 2017. The purpose sentence is a plain-language explanation of that right-of-way function. [Gazette text](https://cdnbbsr.s3waas.gov.in/s3250413d2982f1f83aa62a3a323cd2a87/uploads/2025/06/202506111103541471.pdf)

@@ -15,7 +15,6 @@ import {
   Leaf,
   MapPin,
   Menu,
-  RotateCcw,
   Search,
   ShieldCheck,
   Sparkles,
@@ -36,12 +35,8 @@ const copy = {
     uploadTitle: 'Start with a road image',
     uploadDesc: 'Drop an image here or choose one from your device.',
     browse: 'Browse files',
-    analyze: 'Show demo result',
     meaningTitle: 'What this sign means',
     instructionTitle: 'What you should do',
-    meaning: 'This sign asks road users to come to a complete stop before proceeding.',
-    instruction: 'Stop before the line, check for traffic and pedestrians, then continue only when it is safe.',
-    category: 'Mandatory sign',
     mockNote: 'DEMO OUTPUT — ILLUSTRATIVE EXAMPLE, NOT A REAL MODEL PREDICTION',
     purposeTitle: 'Why this sign is used',
     tip: 'Always follow the sign as posted. This educational tool is not a substitute for road rules or attentive driving.',
@@ -57,12 +52,8 @@ const copy = {
     uploadTitle: 'सड़क की तस्वीर चुनें',
     uploadDesc: 'यहाँ तस्वीर छोड़ें या अपने डिवाइस से चुनें।',
     browse: 'फ़ाइल चुनें',
-    analyze: 'डेमो परिणाम देखें',
     meaningTitle: 'इस संकेत का अर्थ',
     instructionTitle: 'आपको क्या करना चाहिए',
-    meaning: 'यह संकेत आगे बढ़ने से पहले पूरी तरह रुकने को कहता है।',
-    instruction: 'रेखा से पहले रुकें, यातायात और पैदल यात्रियों को देखें, फिर सुरक्षित होने पर आगे बढ़ें।',
-    category: 'अनिवार्य संकेत',
     mockNote: 'डेमो परिणाम — उदाहरण मात्र, वास्तविक मॉडल का पूर्वानुमान नहीं',
     purposeTitle: 'इस संकेत का उद्देश्य',
     tip: 'सड़क पर लगे संकेतों का पालन करें। यह शैक्षिक टूल सड़क नियमों या सावधानीपूर्वक वाहन चलाने का विकल्प नहीं है।',
@@ -189,16 +180,16 @@ function UploadPanel({ file, previewUrl, onFile, onRemove, onDemo, error, t }) {
       <div className="demo-divider"><span>OR TRY A SAMPLE</span></div>
       <button className="sample-button" type="button" onClick={onDemo}>
         <span className="sample-icon"><Sparkles size={16} /></span>
-        <span><strong>Show illustrative sample output</strong><small>A Stop sign example · not a model prediction</small></span>
+        <span><strong>Show Illustrative Example</strong><small>A Stop sign reference · not a model prediction</small></span>
         <ArrowDownRight size={17} className="sample-arrow" />
       </button>
     </section>
   )
 }
 
-function ResultPanel({ result, analysisState, analysisResult, analysisError, previewUrl, t, onReset, onRetry }) {
+function ResultPanel({ analysisState, analysisResult, analysisError, t, onRetry }) {
   const prediction = analysisResult?.prediction
-  const hasResult = result || (analysisState === 'success' && prediction)
+  const hasResult = analysisState === 'success' && prediction
 
   return (
     <section className="result-card" aria-labelledby="result-heading" aria-live="polite">
@@ -206,9 +197,8 @@ function ResultPanel({ result, analysisState, analysisResult, analysisError, pre
         <div>
           <div className="eyebrow"><span className="eyebrow-number">02</span> EXPLANATION</div>
           <h2 id="result-heading">{hasResult ? 'Your sign, explained' : analysisState === 'loading' ? 'Reading your image' : 'A clearer view ahead'}</h2>
-          <p className="card-subtitle">{result ? 'A fixed reference example; no model is used.' : analysisState === 'success' ? 'Model result with a confidence estimate.' : 'Simple, useful context for the road.'}</p>
+          <p className="card-subtitle">{analysisState === 'success' ? 'Model result with a confidence estimate.' : 'An uploaded image is shown separately. Analysis appears here.'}</p>
         </div>
-        {(hasResult || analysisState === 'error') && <button className="icon-button reset-button" type="button" aria-label="Reset result" onClick={onReset}><RotateCcw size={16} /></button>}
       </div>
 
       {analysisState === 'loading' ? (
@@ -216,33 +206,30 @@ function ResultPanel({ result, analysisState, analysisResult, analysisError, pre
       ) : analysisState === 'error' ? (
         <div className="analysis-state analysis-error-state" role="alert"><span className="analysis-state-icon"><X size={18} /></span><h3>We couldn’t analyze this image</h3><p>{analysisError}</p><button type="button" className="analysis-retry" onClick={onRetry}>Try again</button></div>
       ) : analysisState === 'success' && !prediction ? (
-        <div className="analysis-state" role="status"><span className="analysis-state-icon"><Search size={18} /></span><h3>No sign detected</h3><p>Try a closer, well-lit image with the sign clearly visible.</p></div>
+        <div className="analysis-state" role="status"><span className="analysis-state-icon"><Search size={18} /></span><h3>No classification returned</h3><p>The API did not return a sign classification for this image.</p></div>
       ) : hasResult ? (
         <>
-          {result ? <div className="mock-banner"><Sparkles size={14} /><span>{t.mockNote}</span><span className="mock-banner-dot" /></div> : <div className="api-result-banner"><Check size={14} /><span>Recognized by the local model</span><strong>{Math.round(prediction.confidence * 100)}% match</strong></div>}
+          <div className="api-result-banner"><Check size={14} /><span>Recognized by the local model</span><strong>{Math.round(prediction.confidence * 100)}% match</strong></div>
           <div className="result-main">
-            <div className="sign-preview-area">
-              {previewUrl && !result ? <img src={previewUrl} className="result-upload-preview" alt="Uploaded image analyzed by the local API" /> : <StopSign />}
-            </div>
             <div className="result-info">
-              <div className="result-category"><span className="category-dot" />{result ? t.category : prediction.category}</div>
-              <h3>{result ? 'Stop' : prediction.label}</h3>
-              <p className="result-caption">{result ? 'Reference example · Mandatory / Regulatory' : `${prediction.label} · ${analysisResult.model.name}`}</p>
+              <div className="result-category"><span className="category-dot" />{prediction.category}</div>
+              <h3>{prediction.label}</h3>
+              <p className="result-caption">{`Class ${prediction.class_id} · ${analysisResult.model.name}`}</p>
             </div>
           </div>
 
           <div className="explanation-grid">
             <div className="explanation-item">
               <div className="explanation-icon meaning-icon"><BookOpen size={16} /></div>
-              <div><h4>{t.meaningTitle}</h4><p>{result ? 'A driver facing a Stop sign must stop before the stop line. If no line is visible, stop immediately before the sign.' : prediction.explanation.meaning}</p></div>
+              <div><h4>{t.meaningTitle}</h4><p>{prediction.explanation.meaning}</p></div>
             </div>
             <div className="explanation-item">
               <div className="explanation-icon meaning-icon"><Compass size={16} /></div>
-              <div><h4>{t.purposeTitle}</h4><p>{result ? 'To control right of way at a junction or crossing and prevent conflicting traffic movements.' : prediction.explanation.purpose}</p></div>
+              <div><h4>{t.purposeTitle}</h4><p>{prediction.explanation.purpose}</p></div>
             </div>
             <div className="explanation-item">
               <div className="explanation-icon action-icon"><Check size={16} /></div>
-              <div><h4>{t.instructionTitle}</h4><p>{result ? 'Stop at the required point, give way to traffic on the major road and to pedestrians where applicable, and enter only when the way ahead is clear.' : prediction.explanation.recommended_driver_action}</p></div>
+              <div><h4>{t.instructionTitle}</h4><p>{prediction.explanation.recommended_driver_action}</p></div>
             </div>
           </div>
           <div className="safety-note"><ShieldCheck size={16} /><span>{t.tip}</span></div>
@@ -256,11 +243,41 @@ function ResultPanel({ result, analysisState, analysisResult, analysisError, pre
             <div className="empty-road"><span /><span /><span /></div>
             <div className="empty-signpost"><div className="empty-sign"><span /></div><i /></div>
           </div>
-          <h3>{t.idle}</h3>
-          <p>{t.idleDesc}</p>
-          <div className="empty-checklist"><span><Check size={13} /> Easy to understand</span><span><Check size={13} /> Made for Indian roads</span></div>
+          <h3>{analysisState === 'error' ? 'AI recognition is not available yet.' : t.idle}</h3>
+          <p>{analysisState === 'error' ? analysisError : t.idleDesc}</p>
+          {analysisState === 'idle' && <div className="empty-checklist"><span><Check size={13} /> Easy to understand</span><span><Check size={13} /> Made for Indian roads</span></div>}
         </div>
       )}
+    </section>
+  )
+}
+
+function IllustrativeExample({ visible, t, onClose }) {
+  if (!visible) return null
+
+  return (
+    <section className="result-card illustrative-example" aria-labelledby="illustrative-example-heading">
+      <div className="card-heading-row">
+        <div>
+          <div className="eyebrow"><span className="eyebrow-number">REFERENCE</span> NOT MODEL OUTPUT</div>
+          <h2 id="illustrative-example-heading">Illustrative Example</h2>
+          <p className="card-subtitle">A fixed Stop-sign example for demonstrating the result layout.</p>
+        </div>
+        <button className="icon-button reset-button" type="button" aria-label="Hide illustrative example" onClick={onClose}><X size={16} /></button>
+      </div>
+      <div className="mock-banner"><Sparkles size={14} /><span>{t.mockNote}</span></div>
+      <div className="result-main illustrative-result-main">
+        <div className="sign-preview-area"><StopSign /></div>
+        <div className="result-info">
+          <div className="result-category"><span className="category-dot" />Mandatory / Regulatory</div>
+          <h3>Stop</h3>
+        </div>
+      </div>
+      <div className="explanation-grid">
+        <div className="explanation-item"><div className="explanation-icon meaning-icon"><BookOpen size={16} /></div><div><h4>{t.meaningTitle}</h4><p>A driver facing a Stop sign must stop before the stop line. If no line is marked or visible, stop immediately before the sign.</p></div></div>
+        <div className="explanation-item"><div className="explanation-icon meaning-icon"><Compass size={16} /></div><div><h4>{t.purposeTitle}</h4><p>To control right of way at a junction and prevent conflicting traffic movements.</p></div></div>
+        <div className="explanation-item"><div className="explanation-icon action-icon"><Check size={16} /></div><div><h4>{t.instructionTitle}</h4><p>Give way to major-road traffic and pedestrians where applicable. Enter only when the way ahead is clear.</p></div></div>
+      </div>
     </section>
   )
 }
@@ -487,8 +504,9 @@ function App() {
 
           <div className="workspace-grid" id="recognize">
             <UploadPanel file={file} previewUrl={previewUrl} onFile={selectFile} onRemove={removeSelectedFile} onDemo={runDemo} error={error} t={t} />
-            <ResultPanel result={showDemo} analysisState={analysisState} analysisResult={analysisResult} analysisError={analysisError} previewUrl={previewUrl} t={t} onReset={resetResult} onRetry={() => runAnalysis(file)} />
+            <ResultPanel analysisState={analysisState} analysisResult={analysisResult} analysisError={analysisError} t={t} onRetry={() => runAnalysis(file)} />
           </div>
+          <IllustrativeExample visible={showDemo} t={t} onClose={resetResult} />
 
           <footer className="page-footer" id="about">
             <span>ROADWISE <b>·</b> A STUDENT LEARNING PROJECT</span>
