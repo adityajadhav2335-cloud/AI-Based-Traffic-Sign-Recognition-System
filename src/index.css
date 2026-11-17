@@ -1,0 +1,15 @@
+:root {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #282b2b;
+  background: #f4f5f2;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-optical-sizing: auto;
+}
+
+html { min-width: 320px; scroll-behavior: smooth; }
+body { min-width: 320px; min-height: 100vh; margin: 0; }
+button:focus-visible, a:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid #75967d; outline-offset: 3px; }
+::selection { color: #294b39; background: #dae8d9; }

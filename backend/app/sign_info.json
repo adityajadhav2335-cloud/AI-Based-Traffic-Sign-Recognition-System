@@ -1,0 +1,56 @@
+{
+  "stop": {
+    "label": "Stop",
+    "category": "Mandatory",
+    "meaning": "Come to a complete stop before the stop line. Proceed only when the way is clear.",
+    "action": "Stop fully, check all directions, give way to pedestrians, and continue only when it is safe."
+  },
+  "no entry": {
+    "label": "No Entry",
+    "category": "Prohibitory",
+    "meaning": "Vehicles are not allowed to enter the road or lane from this direction.",
+    "action": "Do not enter. Find a permitted route and follow any diversion signs."
+  },
+  "speed limit 50": {
+    "label": "Speed Limit · 50",
+    "category": "Regulatory",
+    "meaning": "The maximum permitted speed on this stretch is 50 km/h.",
+    "action": "Keep your speed at or below the posted limit and reduce it further for road, weather, and traffic conditions."
+  },
+  "speed limit 50 km h": {
+    "label": "Speed Limit · 50",
+    "category": "Regulatory",
+    "meaning": "The maximum permitted speed on this stretch is 50 km/h.",
+    "action": "Keep your speed at or below the posted limit and reduce it further for road, weather, and traffic conditions."
+  },
+  "school ahead": {
+    "label": "School Ahead",
+    "category": "Cautionary",
+    "meaning": "A school or school crossing is ahead, where children may cross the road.",
+    "action": "Slow down, watch both sides of the road, and be ready to stop for children."
+  },
+  "pedestrian crossing": {
+    "label": "Pedestrian Crossing",
+    "category": "Cautionary",
+    "meaning": "A marked crossing for people walking is ahead.",
+    "action": "Slow down and give pedestrians space to cross safely."
+  },
+  "no parking": {
+    "label": "No Parking",
+    "category": "Prohibitory",
+    "meaning": "Parking is prohibited in the area covered by this sign.",
+    "action": "Keep the area clear and look for a designated parking space."
+  },
+  "give way": {
+    "label": "Give Way",
+    "category": "Mandatory",
+    "meaning": "You must yield to traffic on the road you are approaching.",
+    "action": "Slow down, check for traffic and pedestrians, and wait until there is a safe gap."
+  },
+  "no u turn": {
+    "label": "No U-turn",
+    "category": "Prohibitory",
+    "meaning": "Making a U-turn is prohibited at this point.",
+    "action": "Continue ahead and turn around only where signs and road markings allow it."
+  }
+}
