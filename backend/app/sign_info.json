@@ -3,54 +3,63 @@
     "label": "Stop",
     "category": "Mandatory",
     "meaning": "Come to a complete stop before the stop line. Proceed only when the way is clear.",
+    "purpose": "Controls right of way at an intersection and helps prevent conflicting traffic movements.",
     "action": "Stop fully, check all directions, give way to pedestrians, and continue only when it is safe."
   },
   "no entry": {
     "label": "No Entry",
     "category": "Prohibitory",
     "meaning": "Vehicles are not allowed to enter the road or lane from this direction.",
+    "purpose": "Prevents vehicles from entering a road or lane against its permitted direction of travel.",
     "action": "Do not enter. Find a permitted route and follow any diversion signs."
   },
   "speed limit 50": {
     "label": "Speed Limit · 50",
     "category": "Regulatory",
     "meaning": "The maximum permitted speed on this stretch is 50 km/h.",
+    "purpose": "Sets a maximum speed to regulate traffic and reduce risk on this stretch of road.",
     "action": "Keep your speed at or below the posted limit and reduce it further for road, weather, and traffic conditions."
   },
   "speed limit 50 km h": {
     "label": "Speed Limit · 50",
     "category": "Regulatory",
     "meaning": "The maximum permitted speed on this stretch is 50 km/h.",
+    "purpose": "Sets a maximum speed to regulate traffic and reduce risk on this stretch of road.",
     "action": "Keep your speed at or below the posted limit and reduce it further for road, weather, and traffic conditions."
   },
   "school ahead": {
     "label": "School Ahead",
     "category": "Cautionary",
     "meaning": "A school or school crossing is ahead, where children may cross the road.",
+    "purpose": "Warns drivers about children and school-related activity ahead.",
     "action": "Slow down, watch both sides of the road, and be ready to stop for children."
   },
   "pedestrian crossing": {
     "label": "Pedestrian Crossing",
     "category": "Cautionary",
     "meaning": "A marked crossing for people walking is ahead.",
+    "purpose": "Alerts drivers to a designated place where pedestrians may cross.",
     "action": "Slow down and give pedestrians space to cross safely."
   },
   "no parking": {
     "label": "No Parking",
     "category": "Prohibitory",
     "meaning": "Parking is prohibited in the area covered by this sign.",
+    "purpose": "Keeps the signed area clear of parked vehicles.",
     "action": "Keep the area clear and look for a designated parking space."
   },
   "give way": {
     "label": "Give Way",
     "category": "Mandatory",
     "meaning": "You must yield to traffic on the road you are approaching.",
+    "purpose": "Assigns priority to traffic on the road being approached.",
     "action": "Slow down, check for traffic and pedestrians, and wait until there is a safe gap."
   },
   "no u turn": {
     "label": "No U-turn",
     "category": "Prohibitory",
     "meaning": "Making a U-turn is prohibited at this point.",
+    "purpose": "Prevents U-turn movements at a location where they are prohibited.",
     "action": "Continue ahead and turn around only where signs and road markings allow it."
   }
 }

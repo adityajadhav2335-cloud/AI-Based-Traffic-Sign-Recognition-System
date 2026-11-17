@@ -12,17 +12,18 @@ class Explanation(BaseModel):
 class Prediction(BaseModel):
     class_id: int = Field(ge=0)
     label: str
-    category: Literal["Mandatory", "Cautionary", "Informatory"]
-    confidence: float = Field(ge=0, le=1)
+    category: Literal["Mandatory", "Cautionary", "Prohibitory", "Regulatory", "Informatory"]
+    similarity: float = Field(ge=0, le=1)
     explanation: Explanation
 
 
-class ModelInfo(BaseModel):
+class MatcherInfo(BaseModel):
     name: str
     version: str
 
 
 class AnalyzeResponse(BaseModel):
-    status: Literal["ok"]
-    model: ModelInfo
-    prediction: Prediction
+    status: Literal["matched", "no_match"]
+    matcher: MatcherInfo
+    prediction: Prediction | None = None
+    message: str | None = None

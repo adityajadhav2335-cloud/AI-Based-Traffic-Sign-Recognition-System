@@ -8,7 +8,6 @@ from starlette.concurrency import run_in_threadpool
 
 from app.schemas import AnalyzeResponse
 from app.services.detector import (
-    ModelUnavailableError,
     get_detector,
     model_status,
 )
@@ -20,7 +19,7 @@ ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 app = FastAPI(
     title="AI-Based Traffic Sign Recognition System API",
     version="0.1.0",
-    description="Validates uploaded images. Real classification requires a trained MobileNetV2 model.",
+    description="Validates uploaded images and compares them with sign-library templates. This is not a trained AI model.",
 )
 
 app.add_middleware(
@@ -34,10 +33,11 @@ app.add_middleware(
 
 @app.get("/api/health")
 def health() -> dict[str, str | bool]:
-    ready, message = model_status()
+    matcher_ready, message = model_status()
     return {
         "status": "ok",
-        "model_ready": ready,
+        "matcher_ready": matcher_ready,
+        "recognition_mode": "template_matching_prototype",
         "message": message,
     }
 
@@ -71,13 +71,16 @@ async def analyze_image(file: Annotated[UploadFile, File(description="JPG, PNG, 
     try:
         detector = await run_in_threadpool(get_detector)
         prediction = await run_in_threadpool(detector.predict, image)
-    except ModelUnavailableError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
-    return {
-        "status": "ok",
-        "model": {"name": detector.name, "version": detector.version},
-        "prediction": prediction,
-    }
+    matcher = {"name": detector.name, "version": detector.version}
+    if prediction is None:
+        return {
+            "status": "no_match",
+            "matcher": matcher,
+            "prediction": None,
+            "message": "No reliable match found",
+        }
+
+    return {"status": "matched", "matcher": matcher, "prediction": prediction}

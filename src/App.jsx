@@ -31,7 +31,7 @@ const copy = {
   English: {
     hello: 'Hello, road explorer',
     heading: 'Know the sign.\nKnow what to do.',
-    subheading: 'Upload a road image to check the API workflow. The trained recognition model is not connected yet; the separate sample is illustrative only.',
+    subheading: 'Upload a centered sign image to compare it with the sign-library designs. This is a template-matching prototype, not a trained AI model.',
     uploadTitle: 'Start with a road image',
     uploadDesc: 'Drop an image here or choose one from your device.',
     browse: 'Browse files',
@@ -48,7 +48,7 @@ const copy = {
   Hindi: {
     hello: 'नमस्ते, सड़क यात्री',
     heading: 'संकेत समझें।\nसुरक्षित चलें।',
-    subheading: 'यातायात संकेत का अर्थ जानने के लिए सड़क की तस्वीर अपलोड करें। यह डेमो है; परिणाम AI से नहीं आते।',
+    subheading: 'संकेत की तस्वीर को लाइब्रेरी के डिज़ाइन से मिलाने के लिए केंद्रित संकेत की तस्वीर अपलोड करें। यह टेम्पलेट मिलान प्रोटोटाइप है, प्रशिक्षित AI मॉडल नहीं।',
     uploadTitle: 'सड़क की तस्वीर चुनें',
     uploadDesc: 'यहाँ तस्वीर छोड़ें या अपने डिवाइस से चुनें।',
     browse: 'फ़ाइल चुनें',
@@ -106,7 +106,7 @@ function Sidebar({ active, onNavigate, mobileOpen, setMobileOpen }) {
   )
 }
 
-function UploadPanel({ file, previewUrl, onFile, onRemove, onDemo, error, t }) {
+function UploadPanel({ file, previewUrl, onFile, onRemove, onPreviewError, onDemo, error, t }) {
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
 
@@ -147,7 +147,12 @@ function UploadPanel({ file, previewUrl, onFile, onRemove, onDemo, error, t }) {
       >
         {file && previewUrl ? (
           <div className="preview-wrap">
-            <img className="image-preview" src={previewUrl} alt={`Preview of ${file.name}`} />
+            <img
+              className="image-preview"
+              src={previewUrl}
+              alt={`Preview of ${file.name}`}
+              onError={() => onPreviewError(previewUrl)}
+            />
             <div className="preview-file-chip"><FileImage size={14} /><span>{file.name}</span></div>
             <button
               type="button"
@@ -196,25 +201,25 @@ function ResultPanel({ analysisState, analysisResult, analysisError, t, onRetry 
       <div className="card-heading-row result-heading-row">
         <div>
           <div className="eyebrow"><span className="eyebrow-number">02</span> EXPLANATION</div>
-          <h2 id="result-heading">{hasResult ? 'Your sign, explained' : analysisState === 'loading' ? 'Reading your image' : 'A clearer view ahead'}</h2>
-          <p className="card-subtitle">{analysisState === 'success' ? 'Model result with a confidence estimate.' : 'An uploaded image is shown separately. Analysis appears here.'}</p>
+          <h2 id="result-heading">{hasResult ? 'Template match result' : analysisState === 'loading' ? 'Comparing your image' : 'A clearer view ahead'}</h2>
+          <p className="card-subtitle">{analysisState === 'success' && prediction ? 'Matched to a sign-library design. This is not a trained AI prediction.' : 'An uploaded image is shown separately. Analysis appears here.'}</p>
         </div>
       </div>
 
       {analysisState === 'loading' ? (
-        <div className="analysis-state" role="status"><span className="analysis-spinner" /><h3>Checking your image…</h3><p>The image is sent to the local API. Recognition requires a trained model.</p></div>
+        <div className="analysis-state" role="status"><span className="analysis-spinner" /><h3>Comparing sign templates…</h3><p>The local API compares the centered image with the eight sign-library designs. This prototype is not trained AI.</p></div>
       ) : analysisState === 'error' ? (
         <div className="analysis-state analysis-error-state" role="alert"><span className="analysis-state-icon"><X size={18} /></span><h3>We couldn’t analyze this image</h3><p>{analysisError}</p><button type="button" className="analysis-retry" onClick={onRetry}>Try again</button></div>
       ) : analysisState === 'success' && !prediction ? (
-        <div className="analysis-state" role="status"><span className="analysis-state-icon"><Search size={18} /></span><h3>No classification returned</h3><p>The API did not return a sign classification for this image.</p></div>
+        <div className="analysis-state" role="status"><span className="analysis-state-icon"><Search size={18} /></span><h3>No reliable match found</h3><p>The image did not pass the template matcher’s similarity threshold. Try a centered, close-up image of one sign design.</p></div>
       ) : hasResult ? (
         <>
-          <div className="api-result-banner"><Check size={14} /><span>Recognized by the local model</span><strong>{Math.round(prediction.confidence * 100)}% match</strong></div>
+          <div className="api-result-banner"><Check size={14} /><span>Prototype template match · not a trained AI prediction</span></div>
           <div className="result-main">
             <div className="result-info">
               <div className="result-category"><span className="category-dot" />{prediction.category}</div>
               <h3>{prediction.label}</h3>
-              <p className="result-caption">{`Class ${prediction.class_id} · ${analysisResult.model.name}`}</p>
+              <p className="result-caption">{`Template ${prediction.class_id + 1} · ${analysisResult.matcher.name}`}</p>
             </div>
           </div>
 
@@ -437,9 +442,29 @@ function App() {
       setError('This image is larger than 10 MB. Please choose a smaller file.')
       return
     }
+    let nextPreviewUrl
+    try {
+      nextPreviewUrl = URL.createObjectURL(selectedFile)
+    } catch {
+      setFile(null)
+      setPreviewUrl('')
+      setError('This image could not be previewed. Please choose a valid JPG, PNG or WEBP image.')
+      return
+    }
     setFile(selectedFile)
-    setPreviewUrl(URL.createObjectURL(selectedFile))
+    setPreviewUrl(nextPreviewUrl)
     runAnalysis(selectedFile)
+  }
+
+  const handlePreviewError = (failedPreviewUrl) => {
+    if (failedPreviewUrl !== previewUrl) return
+    analysisRequestRef.current += 1
+    setFile(null)
+    setPreviewUrl('')
+    setError('This image could not be previewed. Please choose a valid JPG, PNG or WEBP image.')
+    setAnalysisState('idle')
+    setAnalysisResult(null)
+    setAnalysisError('')
   }
 
   const runDemo = () => {
@@ -503,7 +528,7 @@ function App() {
           </section>
 
           <div className="workspace-grid" id="recognize">
-            <UploadPanel file={file} previewUrl={previewUrl} onFile={selectFile} onRemove={removeSelectedFile} onDemo={runDemo} error={error} t={t} />
+            <UploadPanel file={file} previewUrl={previewUrl} onFile={selectFile} onRemove={removeSelectedFile} onPreviewError={handlePreviewError} onDemo={runDemo} error={error} t={t} />
             <ResultPanel analysisState={analysisState} analysisResult={analysisResult} analysisError={analysisError} t={t} onRetry={() => runAnalysis(file)} />
           </div>
           <IllustrativeExample visible={showDemo} t={t} onClose={resetResult} />
